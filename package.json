@@ -4,7 +4,7 @@
   "private": true,
   "description": "",
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "start": "source .env && ts-node src/index.ts"
   },
   "keywords": [
     "twitter",
