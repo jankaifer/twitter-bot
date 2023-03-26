@@ -1,4 +1,5 @@
-import puppeteer from "puppeteer";
+import puppeteer, { Puppeteer } from "puppeteer";
+import { config } from "dotenv";
 
 const waitForKeyPress = async () => {
   process.stdin.setRawMode(true);
@@ -16,20 +17,41 @@ const alert = async (message: string) => {
 };
 
 async function main() {
+  config();
+
   const browser = await puppeteer.launch({
     headless: false,
     defaultViewport: {
-      width: 1080,
-      height: 1024,
+      width: 1450,
+      height: 850,
     },
   });
   const page = await browser.newPage();
 
-  await page.goto("https://twitter.com");
+  const type = async (selector: string, text: string) => {
+    await page.waitForSelector(selector);
+    await page.type(selector, text);
+  };
 
-  await alert("Please login to Twitter and press ENTER to continue.");
+  const click = async (selector: string) => {
+    await page.waitForSelector(selector);
+    await page.click(selector);
+  };
 
-  await browser.close();
+  await page.goto("https://twitter.com/login");
+  await type('input[autocomplete="username"]', process.env.TWITTER_EMAIL!);
+  await type('input[autocomplete="username"]', "\n");
+  await type(
+    'input[autocomplete="current-password"]',
+    process.env.TWITTER_PASSWORD!
+  );
+  await type('input[autocomplete="current-password"]', "\n");
+
+  await click('span[aria-label="Refuse non-essential cookies"]');
+
+  // await alert("Please login to Twitter and press ENTER to continue.");
+
+  // await browser.close();
 }
 
 main();
